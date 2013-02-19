@@ -11,34 +11,54 @@ executeList = []
 
 return if typeof(command) != 'string'
 
-greeny = (string) -> "\u001b[32m\u001b[1m#{string}\u001b[39m"
+color = (color, string) -> "\u001b[#{color}m\u001b[1m#{string}\u001b[22m\u001b[39m"
+colorAll = (string) -> color "32", string
+colorImportant = (string) -> color "33", string
+
+# #it
+# #dir #name #ext
+# #dir    #file
+#   #path    #ext
+
+pathSplit = (filePath) ->
+  dirPath = path.dirname(filePath)
+  extension = path.extname(filePath)
+  baseName = path.basename(filePath, extension)
+  [dirPath, baseName, extension]
 
 mapping = (filePath) ->
   mapped = command
   colorized = command
 
-  # fill #it
-  mapped = mapped.replace /#it/g, filePath
-  colorized = colorized.replace /#it/g, greeny filePath
+  [dirPath, baseName, extension] = split = pathSplit filePath
+  dirAndName = path.join(dirPath, baseName)
 
-  # fill #name and #ext
-  fileExt = path.extname(filePath)
-  if fileExt
-    fileName = filePath.replace new RegExp("#{fileExt}$"), ''
-    mapped = mapped
-    .replace(/#name/g, fileName)
-    .replace(/#ext/g, fileExt)
-    colorized = colorized
-    .replace(/#name/g, greeny fileName)
-    .replace(/#ext/g, greeny fileExt)
-  else
-    if mapped.match /(^|[^\\])#name/
-      console.error "#name token used but #{greeny filePath} was not found."
-      process.exit 1
-    if mapped.match /(^|[^\\])#ext/
-      console.error "#ext token used but #{greeny filePath} was not found."
-      process.exit 1
+  colorBaseName = colorImportant baseName
+  colorDirAndName = dirAndName.replace(new RegExp("#{baseName}$"), colorBaseName)
 
+  map =
+    'it': [filePath, colorDirAndName + extension]
+    'dir': [dirPath, dirPath]
+    'name':  [baseName, colorBaseName]
+    'ext':  [extension, extension]
+    'file':  [baseName + extension, colorBaseName + extension]
+    'path':  [dirAndName, colorDirAndName]
+
+  replace = (string, alias, value) ->
+    string
+    .replace(new RegExp("(^|[^#])##{alias}", "g"), "$1#{value}")
+    .replace(new RegExp("#(##{alias})", "g"), "$1")
+
+  # perform the mapping
+  for alias, [value, colorValue] of map
+    mapped = replace mapped, alias, value
+    colorized = replace colorized, alias, colorAll colorValue
+
+  if !extension?
+    for invalid in ['name', 'path', 'ext']
+      if mapped.match new RegExp("(^|[^#])##{invalid}")
+        console.error "##{invalid} token used but #{clrGreen filePath} was not found."
+        process.exit 1
 
   return [mapped, colorized]
 
