@@ -21,13 +21,13 @@ $ map one two three "touch document_#it.md"
 ```
 
 ```bash
-$ map folder/ "convert #it #name.png"
+$ map folder/ "convert #it #path.png"
 ```
 
 Note the `/` at the end of folder name is important.
 
 ```bash
-$ map folder/ "mv #it #name_backup#ext"
+$ map folder/ "mv #it #dir/good_#name_backup#ext"
 ```
 
 ```bash
