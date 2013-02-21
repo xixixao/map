@@ -89,14 +89,21 @@ mapTo = (list, inside) ->
 isBackgroundProcess = (command) ->
   command.match(/&\s*$/)?
 
+
+comment =
+  if process.env.MAPSILENT == "true"
+    (string) ->
+  else
+    (string) -> console.log string
+
 numberExecuted = 0
 execute = (list) ->
   if list.length is 0
-    console.log '' if numberExecuted > 0
+    comment '' if numberExecuted > 0
     return
-  console.log '' if numberExecuted is 0
+  comment '' if numberExecuted is 0
   [mapped, colorized] = list.shift()
-  console.log colorized
+  comment colorized
   numberExecuted++
   isBackground = isBackgroundProcess mapped
   exec mapped, (error, stdout, stderr) ->
