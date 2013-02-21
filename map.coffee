@@ -86,6 +86,9 @@ mapTo = (list, inside) ->
     executeList.push mapping filePath
   return
 
+isBackgroundProcess = (command) ->
+  command.match(/&\s*$/)?
+
 numberExecuted = 0
 execute = (list) ->
   if list.length is 0
@@ -95,10 +98,12 @@ execute = (list) ->
   [mapped, colorized] = list.shift()
   console.log colorized
   numberExecuted++
+  isBackground = isBackgroundProcess mapped
   exec mapped, (error, stdout, stderr) ->
     util.print stdout if stdout.length
     util.error stderr.replace /\n$/, '' if stderr.length
-    execute list
+    execute list if !isBackground
+  execute list if isBackground
   return
 
 mapTo args[2..-2]
