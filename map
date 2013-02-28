@@ -90,9 +90,9 @@ doesExist = function(filePath) {
 };
 
 isDirectory = function(filePath) {
-  var fileStats, _ref;
+  var fileStats, _ref, _ref1;
   fileStats = fs.statSync(filePath);
-  return fileStats.isDirectory() && ((_ref = filePath[filePath.length - 1]) === '/' || _ref === '\\');
+  return fileStats.isDirectory() && (((_ref = filePath[filePath.length - 1]) === '/' || _ref === '\\') || ((_ref1 = path.basename(filePath)) === '.' || _ref1 === '..'));
 };
 
 mapTo = function(list, inside) {

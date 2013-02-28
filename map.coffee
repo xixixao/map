@@ -72,8 +72,11 @@ doesExist = (filePath) ->
 
 isDirectory = (filePath) ->
   fileStats = fs.statSync filePath
-  return fileStats.isDirectory() &&
-         filePath[filePath.length - 1] in ['/', '\\']
+  fileStats.isDirectory() &&
+  (
+    filePath[filePath.length - 1] in ['/', '\\'] ||
+    path.basename(filePath) in ['.', '..']
+  )
 
 mapTo = (list, inside) ->
   for filePath in list
